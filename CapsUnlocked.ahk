@@ -6,14 +6,19 @@
 ;  * Use CapsLock as Escape if it's the only key that is pressed and released within 300ms (configurable)
 ;  * Use CapsLock as LControl when used in conjunction with some other key or if it's held longer than 300ms
 ;  * Toggle CapsLock by pressing LControl+CapsLock
-
+#SingleInstance Force
 #InstallKeybdHook
 SetCapsLockState, alwaysoff
 StartTime := 0
 *Capslock::
 if (GetKeyState("LControl", "P")) {
   KeyWait, CapsLock
-  Send {CapsLock Down}
+  if (GetKeyState("Capslock", "T") = 1) {
+	SetCapsLockState, alwaysoff
+  }
+  else {
+	Send {CapsLock Down}
+  }
   return
 }
 
@@ -33,7 +38,7 @@ if (  State
 }
 
 elapsedTime := A_TickCount - StartTime
-IniRead, timeout,    %A_ScriptDir%\Settings.ini, CapsUnlocked, Timeout, 300
+IniRead, timeout,    %A_ScriptDir%\Settings.ini, CapsUnlocked, Timeout, 200
 if (  (A_PriorKey = "CapsLock")
    && (A_TickCount - StartTime < timeout)) {
   Send {Esc}
